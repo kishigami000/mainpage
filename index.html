@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>My GitHub Gists & Pages</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    h1 {
+        margin-bottom: 1em;
+    }
+    .sub-title {
+        font-size: 0.4em;
+        font-weight: normal;
+    }
+
+    h2 { margin-top: 2em; }
+    .item { margin-bottom: 10px; }
+    a { color: blue; text-decoration: none; }
+  </style>
+</head>
+<body>
+    <h1>
+    <span class="main-title">作成したもの</span><br>
+    <span class="sub-title">※2023年以降のものはAI利用を含みます</span>
+    </h1>
+  <!-- GitHub Pagesセクション -->
+  <h2>📄 GitHub Pages サイト</h2>
+  <div id="repo-pages">読み込み中...</div>
+
+  <!-- Gist一覧セクション -->
+  <h2>📝 Gist一覧（雑記）</h2>
+  <div id="gist-list">読み込み中...</div>
+
+  <script>
+    const username = 'kishigami000';
+
+    /** GitHub Pages のリポジトリ一覧取得 */
+    fetch(`https://api.github.com/users/${username}/repos`)
+    .then(response => response.json())
+    .then(repos => {
+        const container = document.getElementById('repo-pages');
+        container.innerHTML = '';
+        repos.forEach(repo => {
+        const pagesUrl = repo.homepage || `https://${username}.github.io/${repo.name}/`;
+
+        const label = repo.description || repo.name; // 説明が無ければリポジトリ名を使う
+
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+            <a href="${pagesUrl}" target="_blank">${label}</a>
+        `;
+        container.appendChild(div);
+        });
+    })
+    .catch(error => {
+        document.getElementById('repo-pages').innerHTML = 'リポジトリの取得中にエラーが発生しました。';
+        console.error(error);
+    });
+
+    /** Gist 一覧の取得 */
+    fetch(`https://api.github.com/users/${username}/gists`)
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('gist-list');
+        container.innerHTML = '';
+        data.forEach(gist => {
+          const fileNames = Object.keys(gist.files);
+          const createdDate = new Date(gist.created_at).toLocaleDateString();
+
+          fileNames.forEach(name => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `
+              <a href="${gist.html_url}" target="_blank">${name}</a>（${createdDate}）
+            `;
+            container.appendChild(div);
+          });
+        });
+      })
+      .catch(error => {
+        document.getElementById('gist-list').innerHTML = 'Gistの取得中にエラーが発生しました。';
+        console.error(error);
+      });
+  </script>
+</body>
+</html>
