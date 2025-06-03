@@ -41,6 +41,8 @@
         const container = document.getElementById('repo-pages');
         container.innerHTML = '';
         repos.forEach(repo => {
+        if (repo.name === 'mainpage') return; // 本ページはスキップ
+
         const pagesUrl = repo.homepage || `https://${username}.github.io/${repo.name}/`;
 
         const label = repo.description || repo.name; // 説明が無ければリポジトリ名を使う
